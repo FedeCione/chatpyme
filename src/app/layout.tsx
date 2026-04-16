@@ -11,11 +11,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'ChatPyME — demo de chatbot WhatsApp con IA',
   description:
-    'Demo público de un chatbot con IA para PyMEs: reserva de turnos, derivación a humano y respuestas en tono argentino. Construido en un fin de semana por Federico Cione.',
+    'Demo pública de un chatbot con IA para PyMEs: reserva de turnos, derivación a humano y respuestas en tono argentino. Construido en un fin de semana por Federico Cione.',
   openGraph: {
     title: 'ChatPyME — demo de chatbot WhatsApp con IA',
     description: 'Chatbot demo para una clínica: agenda turnos, deriva a humano, responde en rioplatense.',
     type: 'website',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'ChatPyME — demo de chatbot WhatsApp con IA' }],
   },
 };
 

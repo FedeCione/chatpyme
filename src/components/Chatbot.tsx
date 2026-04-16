@@ -43,6 +43,7 @@ function now(): string {
   return new Date().toLocaleTimeString('es-AR', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   });
 }
 
@@ -54,16 +55,7 @@ function id(): string {
 }
 
 export function Chatbot() {
-  const [messages, setMessages] = useState<LocalMsg[]>(() => [
-    {
-      kind: 'chat',
-      id: id(),
-      role: 'assistant',
-      text: GREETING,
-      timestamp: now(),
-      seeded: true,
-    },
-  ]);
+  const [messages, setMessages] = useState<LocalMsg[]>([]);
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending'>('idle');
   const [handoffActive, setHandoffActive] = useState(false);
@@ -71,6 +63,16 @@ export function Chatbot() {
 
   useEffect(() => {
     track('chat_open');
+    setMessages([
+      {
+        kind: 'chat',
+        id: id(),
+        role: 'assistant',
+        text: GREETING,
+        timestamp: now(),
+        seeded: true,
+      },
+    ]);
   }, []);
 
   useEffect(() => {

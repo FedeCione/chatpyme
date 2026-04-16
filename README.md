@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChatPyME — demo de chatbot WhatsApp con IA
 
-## Getting Started
+Demo público de un chatbot con IA diseñado para PyMEs argentinas. El bot actúa como recepcionista virtual de una clínica ficticia: responde consultas, agenda turnos y deriva a un humano cuando es necesario.
 
-First, run the development server:
+**Stack**: Next.js 16 · Groq (Llama 3.3 70B) · Zod v4 · Tailwind CSS v4 · Vercel Analytics
+
+## Cómo probarlo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.local.example .env.local
+# Completá GROQ_API_KEY con tu key de https://console.groq.com/keys
 pnpm dev
-# or
-bun dev
+# Abrí http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Sin `GROQ_API_KEY` el bot responde con un placeholder `[DEMO MODE]`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cómo retargetearlo para tu negocio
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Editá un solo archivo: `src/data/clinic.ts`. Cambiá nombre, dirección, teléfono, horarios, especialidades y obras sociales. El system prompt y el bot se reconfiguran automáticamente.
 
-## Learn More
+## Cómo se conecta a WhatsApp Business Cloud API en producción
 
-To learn more about Next.js, take a look at the following resources:
+En la demo el chat es una UI web que imita WhatsApp. En producción el flujo es:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+Usuario envía mensaje por WhatsApp
+  → Meta entrega un webhook POST /webhook/whatsapp
+  → Tu servidor verifica la firma HMAC del payload
+  → Extrae messages[0].text.body
+  → Llama al mismo endpoint /api/chat con el historial
+  → Recibe la respuesta del bot
+  → POST https://graph.facebook.com/v19.0/{phone-id}/messages
+    con el reply como texto
+  → El usuario recibe la respuesta en su WhatsApp
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Eso es lo que entrega el servicio pago: la integración con Meta, la verificación de firma, el manejo de sesiones y el deploy en infraestructura real. La demo prueba que el cerebro del bot funciona.
 
-## Deploy on Vercel
+## Estructura
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/
+    api/chat/route.ts   — validación, rate limit, llamada a Groq
+    page.tsx             — phone-frame wrapper
+    layout.tsx           — metadata, fonts, analytics
+    globals.css          — Tailwind v4 @theme (paleta WhatsApp)
+  components/
+    Chatbot.tsx          — orquestador de estado y fetch
+    Header.tsx           — barra verde con avatar y "en línea"
+    MessageBubble.tsx    — burbuja usuario/bot con timestamp
+    TypingIndicator.tsx  — tres puntos animados
+    QuickReplies.tsx     — chips de respuesta rápida
+    AppointmentCard.tsx  — card de turno confirmado
+    HandoffBanner.tsx    — aviso de derivación a humano
+  data/
+    clinic.ts            — datos de la clínica (fuente de verdad)
+  lib/
+    clinicPrompt.ts      — system prompt + buildMessages()
+    intents.ts           — parser de [INTENT:*] tokens
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Autor
+
+**Federico Cione** — Backend Engineer · IA & Automatización
+
+- Portfolio: [fedecione.dev](https://fedecione.dev)
+- GitHub: [github.com/fedecione](https://github.com/fedecione)
+
+## Licencia
+
+MIT

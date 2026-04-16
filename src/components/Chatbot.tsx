@@ -180,12 +180,12 @@ export function Chatbot() {
   const agentHasResponded = messages.some((m) => m.kind === 'agent');
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-wa-chat-bg">
+    <div className="flex h-full flex-col overflow-hidden">
       <Header />
 
       <div
         ref={scrollRef}
-        className="flex-1 space-y-2 overflow-y-auto px-3 py-3"
+        className="wa-wallpaper chat-scroll flex-1 space-y-1.5 overflow-y-auto px-3 py-3"
         aria-live="polite"
       >
         {messages.map((m) => {
@@ -247,22 +247,22 @@ export function Chatbot() {
 
       <form
         onSubmit={onSubmit}
-        className="flex items-center gap-2 border-t border-wa-bubble-border bg-white p-2"
+        className="flex items-center gap-2 bg-wa-input-bg px-2 py-2"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={handoffActive || status === 'sending'}
-          placeholder={handoffActive ? 'Chat derivado a un humano' : 'Escribí un mensaje'}
-          className="flex-1 rounded-full border border-wa-bubble-border bg-gray-50 px-4 py-2 text-sm outline-none focus-visible:border-wa-accent focus-visible:bg-white disabled:bg-gray-100 disabled:text-gray-400"
+          placeholder={handoffActive ? 'Chat derivado a un humano' : 'Escribi un mensaje'}
+          className="flex-1 rounded-full bg-white px-4 py-2.5 text-[13.5px] shadow-sm outline-none placeholder:text-gray-400 focus-visible:shadow-md disabled:bg-gray-100 disabled:text-gray-400"
           aria-label="Mensaje"
           autoComplete="off"
         />
         <button
           type="submit"
           disabled={!input.trim() || status === 'sending' || handoffActive}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-wa-accent text-white transition-colors hover:bg-wa-header-dark disabled:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wa-accent"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-wa-accent text-white shadow-sm transition-all hover:bg-wa-header-dark hover:shadow-md active:scale-95 disabled:bg-gray-300 disabled:shadow-none"
           aria-label="Enviar mensaje"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden>

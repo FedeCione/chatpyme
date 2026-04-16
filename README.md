@@ -66,7 +66,7 @@ src/
 
 **Federico Cione** — Backend Engineer · IA & Automatización
 
-- Portfolio: [fedecione.dev](https://fedecione.dev)
+- Portfolio: [fedecione.dev](https://fedecione-portfolio.vercel.app)
 - GitHub: [github.com/fedecione](https://github.com/fedecione)
 
 ## Licencia

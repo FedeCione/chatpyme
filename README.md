@@ -1,6 +1,6 @@
 # ChatPyME — demo de chatbot WhatsApp con IA
 
-Demo público de un chatbot con IA diseñado para PyMEs argentinas. El bot actúa como recepcionista virtual de una clínica ficticia: responde consultas, agenda turnos y deriva a un humano cuando es necesario.
+Demo pública de un chatbot con IA diseñado para PyMEs argentinas. El bot actúa como recepcionista virtual de una clínica ficticia: responde consultas, agenda turnos y deriva a un humano cuando es necesario.
 
 **Stack**: Next.js 16 · Groq (Llama 3.3 70B) · Zod v4 · Tailwind CSS v4 · Vercel Analytics
 

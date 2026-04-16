@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 md:p-6">
       <p className="mb-4 hidden text-center text-sm text-gray-600 md:block">
-        Demo público · Construido por{' '}
+        Demo pública · Construido por{' '}
         <a
           href="https://fedecione.dev"
           target="_blank"

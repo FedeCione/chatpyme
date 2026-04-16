@@ -6,7 +6,7 @@ export default function Home() {
       <p className="mb-4 hidden text-center text-sm text-gray-600 md:block">
         Demo pública · Construido por{' '}
         <a
-          href="https://fedecione.dev"
+          href="https://fedecione-portfolio.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
           className="font-medium text-wa-header hover:underline"
@@ -28,7 +28,7 @@ export default function Home() {
       </div>
       <p className="w-full border-t border-gray-200 bg-white px-4 py-2 text-center text-xs text-gray-600 md:hidden">
         Demo por{' '}
-        <a href="https://fedecione.dev" className="font-medium text-wa-header">
+        <a href="https://fedecione-portfolio.vercel.app" className="font-medium text-wa-header">
           fedecione.dev
         </a>
       </p>

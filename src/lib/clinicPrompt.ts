@@ -10,11 +10,39 @@ type GroqMessage = {
   content: string;
 };
 
+function localIso(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 function today(): { iso: string; weekday: string } {
   const now = new Date();
-  const iso = now.toISOString().slice(0, 10);
   const weekday = new Intl.DateTimeFormat('es-AR', { weekday: 'long' }).format(now);
-  return { iso, weekday };
+  return { iso: localIso(now), weekday };
+}
+
+function next7Days(): string {
+  const fmt = new Intl.DateTimeFormat('es-AR', { weekday: 'long' });
+  const now = new Date();
+  const lines: string[] = [];
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() + i);
+    const weekday = fmt.format(d);
+    const dow = d.getDay();
+    const prefix =
+      i === 1 ? `mañana (${weekday})` : i === 2 ? `pasado mañana (${weekday})` : weekday;
+    const hours =
+      dow === 0
+        ? ' — CERRADO, no se reservan turnos'
+        : dow === 6
+        ? ` — atiende ${clinic.hours.saturday}`
+        : '';
+    lines.push(`- ${prefix}: ${localIso(d)}${hours}`);
+  }
+  return lines.join('\n');
 }
 
 export function getSystemPrompt(): string {
@@ -37,7 +65,12 @@ ${specialties}
 Obras sociales aceptadas:
 ${insurances}
 
-Fecha de hoy: ${iso} (${weekday}). Usala para resolver referencias como "mañana", "el jueves", "la semana que viene".
+Fecha de hoy: ${iso} (${weekday}). Hoy no se reservan turnos (antelación mínima ${clinic.booking.minAdvanceHours} h).
+
+FECHAS DE LOS PRÓXIMOS DÍAS (copiá estas fechas literalmente — no calcules):
+${next7Days()}
+
+Regla crítica: cuando el usuario mencione un día de la semana o "mañana"/"pasado mañana", buscá el ítem correspondiente en la lista de arriba y copiá esa fecha en el token INTENT. Nunca emitas una fecha que no figure en esa lista. Si pide un día que no está, pedile la fecha exacta en formato día/mes.
 
 REGLAS ESTRICTAS:
 - Nunca inventes especialidades, profesionales, horarios ni obras sociales fuera de las listadas.

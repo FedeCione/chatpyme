@@ -1,74 +1,82 @@
-# ChatPyME — demo de chatbot WhatsApp con IA
+# ChatPyME — WhatsApp AI chatbot demo
 
-Demo pública de un chatbot con IA diseñado para PyMEs argentinas. El bot actúa como recepcionista virtual de una clínica ficticia: responde consultas, agenda turnos y deriva a un humano cuando es necesario.
+[![Next.js](https://img.shields.io/badge/next.js-16-000000?logo=next.js&logoColor=white)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/typescript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/tailwind-4-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Groq](https://img.shields.io/badge/groq-llama%203.3%2070B-f55036?logo=meta&logoColor=white)](https://groq.com)
+[![License: MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](./LICENSE)
+
+Public demo of an AI chatbot designed for LATAM SMBs. The bot acts as the virtual receptionist for a fictional clinic — it answers questions, books appointments, and hands off to a human when needed.
 
 **Stack**: Next.js 16 · Groq (Llama 3.3 70B) · Zod v4 · Tailwind CSS v4 · Vercel Analytics
 
-## Cómo probarlo
+## Quick start
 
 ```bash
 pnpm install
 cp .env.local.example .env.local
-# Completá GROQ_API_KEY con tu key de https://console.groq.com/keys
+# Fill in GROQ_API_KEY with your key from https://console.groq.com/keys
 pnpm dev
-# Abrí http://localhost:3000
+# Open http://localhost:3000
 ```
 
-Sin `GROQ_API_KEY` el bot responde con un placeholder `[DEMO MODE]`.
+Without `GROQ_API_KEY`, the bot replies with a `[DEMO MODE]` placeholder.
 
-## Cómo retargetearlo para tu negocio
+## Retargeting it for your business
 
-Editá un solo archivo: `src/data/clinic.ts`. Cambiá nombre, dirección, teléfono, horarios, especialidades y obras sociales. El system prompt y el bot se reconfiguran automáticamente.
+Edit a single file: `src/data/clinic.ts`. Change name, address, phone, hours, specialties, and accepted insurance plans. The system prompt and the bot reconfigure automatically.
 
-## Cómo se conecta a WhatsApp Business Cloud API en producción
+## How it connects to WhatsApp Business Cloud API in production
 
-En la demo el chat es una UI web que imita WhatsApp. En producción el flujo es:
+In the demo, the chat is a web UI that mimics WhatsApp. In production the flow is:
 
 ```
-Usuario envía mensaje por WhatsApp
-  → Meta entrega un webhook POST /webhook/whatsapp
-  → Tu servidor verifica la firma HMAC del payload
-  → Extrae messages[0].text.body
-  → Llama al mismo endpoint /api/chat con el historial
-  → Recibe la respuesta del bot
+User sends a message via WhatsApp
+  → Meta delivers a webhook POST /webhook/whatsapp
+  → Your server verifies the payload's HMAC signature
+  → Extracts messages[0].text.body
+  → Calls the same /api/chat endpoint with the history
+  → Receives the bot's reply
   → POST https://graph.facebook.com/v19.0/{phone-id}/messages
-    con el reply como texto
-  → El usuario recibe la respuesta en su WhatsApp
+    with the reply as text
+  → The user receives the response on their WhatsApp
 ```
 
-Eso es lo que entrega el servicio pago: la integración con Meta, la verificación de firma, el manejo de sesiones y el deploy en infraestructura real. La demo prueba que el cerebro del bot funciona.
+That's what the paid service delivers: the Meta integration, signature verification, session management, and deployment to real infrastructure. The demo proves the bot's brain works.
 
-## Estructura
+## Project layout
 
 ```
 src/
   app/
-    api/chat/route.ts   — validación, rate limit, llamada a Groq
+    api/chat/route.ts   — validation, rate limit, Groq call
     page.tsx             — phone-frame wrapper
     layout.tsx           — metadata, fonts, analytics
-    globals.css          — Tailwind v4 @theme (paleta WhatsApp)
+    globals.css          — Tailwind v4 @theme (WhatsApp palette)
   components/
-    Chatbot.tsx          — orquestador de estado y fetch
-    Header.tsx           — barra verde con avatar y "en línea"
-    MessageBubble.tsx    — burbuja usuario/bot con timestamp
-    TypingIndicator.tsx  — tres puntos animados
-    QuickReplies.tsx     — chips de respuesta rápida
-    AppointmentCard.tsx  — card de turno confirmado
-    HandoffBanner.tsx    — aviso de derivación a humano
+    Chatbot.tsx          — state and fetch orchestrator
+    Header.tsx           — green bar with avatar and "online" indicator
+    MessageBubble.tsx    — user/bot bubble with timestamp
+    TypingIndicator.tsx  — three animated dots
+    QuickReplies.tsx     — quick-reply chips
+    AppointmentCard.tsx  — confirmed appointment card
+    HandoffBanner.tsx    — human handoff notice
   data/
-    clinic.ts            — datos de la clínica (fuente de verdad)
+    clinic.ts            — clinic data (source of truth)
   lib/
     clinicPrompt.ts      — system prompt + buildMessages()
-    intents.ts           — parser de [INTENT:*] tokens
+    intents.ts           — [INTENT:*] token parser
 ```
 
-## Autor
+## About the author / Sobre el autor
 
-**Federico Cione** — Backend Engineer · IA & Automatización
+**EN** — Built by **Federico Cione**, a backend engineer from Argentina. I build typed, tested, AI-integrated backends and conversational interfaces for product teams. Available for **WhatsApp AI chatbot** engagements. [Book a discovery call →](https://fedecione-portfolio.vercel.app/#contact)
 
-- Portfolio: [fedecione.dev](https://fedecione-portfolio.vercel.app)
-- GitHub: [github.com/fedecione](https://github.com/fedecione)
+**ES** — Hecho por **Federico Cione**, desarrollador backend argentino. Construyo backends tipados, testeados y con IA integrada, e interfaces conversacionales para equipos de producto. Disponible para paquetes de **chatbot WhatsApp con IA**. [Agendá una llamada →](https://fedecione-portfolio.vercel.app/#contact)
 
-## Licencia
+- Portfolio: [fedecione-portfolio.vercel.app](https://fedecione-portfolio.vercel.app)
+- GitHub: [github.com/FedeCione](https://github.com/FedeCione)
 
-MIT
+## License
+
+[MIT](./LICENSE) © Federico Cione

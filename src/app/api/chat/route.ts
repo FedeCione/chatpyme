@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod/v4';
 import Groq from 'groq-sdk';
 import { buildMessages } from '@/lib/clinicPrompt';
+import { parseAssistantResponse } from '@/lib/intents';
 
 const messageSchema = z.object({
   role: z.enum(['user', 'assistant']),
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ reply: DEMO_REPLY });
+    return NextResponse.json({ reply: DEMO_REPLY, intent: null });
   }
 
   try {
@@ -88,15 +89,17 @@ export async function POST(request: Request) {
       model: 'llama-3.3-70b-versatile',
       temperature: 0.3,
       max_tokens: 400,
+      response_format: { type: 'json_object' },
       messages: buildMessages(parsed.data.messages),
     });
 
-    const reply = completion.choices[0]?.message?.content?.trim();
-    if (!reply) {
+    const content = completion.choices[0]?.message?.content;
+    const result = content ? parseAssistantResponse(content) : null;
+    if (!result) {
       return NextResponse.json({ error: 'chat_unavailable' }, { status: 503 });
     }
 
-    return NextResponse.json({ reply });
+    return NextResponse.json({ reply: result.text, intent: result.intent ?? null });
   } catch {
     return NextResponse.json({ error: 'chat_unavailable' }, { status: 503 });
   }

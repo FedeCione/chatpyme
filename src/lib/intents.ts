@@ -1,40 +1,52 @@
 import { z } from 'zod/v4';
 
-const appointmentSchema = z.object({
+const appointmentIntentSchema = z.object({
+  kind: z.literal('appointment'),
   specialty: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   time: z.string().regex(/^\d{2}:\d{2}$/),
 });
 
-export type ParsedIntent =
-  | { kind: 'appointment'; specialty: string; date: string; time: string }
-  | { kind: 'handoff' };
+const handoffIntentSchema = z.object({
+  kind: z.literal('handoff'),
+});
 
-const APPOINTMENT_RE = /\n?\[INTENT:APPOINTMENT\](\{[^}]*\})/;
-const HANDOFF_RE = /\n?\[INTENT:HANDOFF\]/;
+const intentSchema = z.discriminatedUnion('kind', [
+  appointmentIntentSchema,
+  handoffIntentSchema,
+]);
 
-export function parseReply(raw: string): { text: string; intent?: ParsedIntent } {
-  let text = raw;
-  let intent: ParsedIntent | undefined;
+const assistantResponseSchema = z.object({
+  reply: z.string().trim().min(1),
+  intent: z.unknown().optional(),
+});
 
-  const apptMatch = text.match(APPOINTMENT_RE);
-  if (apptMatch) {
-    try {
-      const parsed = appointmentSchema.safeParse(JSON.parse(apptMatch[1]));
-      if (parsed.success) {
-        intent = { kind: 'appointment', ...parsed.data };
-      }
-    } catch {
-      // Drop the intent; keep the cleaned text.
-    }
-    text = text.replace(APPOINTMENT_RE, '');
+export type ParsedIntent = z.infer<typeof intentSchema>;
+
+/**
+ * Validates the model's JSON-mode output against the response schema.
+ *
+ * The model is asked (via the system prompt) to return a single JSON object
+ * `{ reply, intent }`. We trust nothing: the raw string is JSON-parsed and the
+ * shape is validated with Zod. A malformed intent is dropped without losing the
+ * reply; an unusable reply (or invalid JSON) yields `null` so the caller can
+ * surface an error instead of rendering garbage.
+ */
+export function parseAssistantResponse(
+  raw: string,
+): { text: string; intent?: ParsedIntent } | null {
+  let json: unknown;
+  try {
+    json = JSON.parse(raw);
+  } catch {
+    return null;
   }
 
-  if (HANDOFF_RE.test(text)) {
-    if (!intent) intent = { kind: 'handoff' };
-    text = text.replace(HANDOFF_RE, '');
-  }
+  const base = assistantResponseSchema.safeParse(json);
+  if (!base.success) return null;
 
-  text = text.trim();
-  return intent ? { text, intent } : { text };
+  const text = base.data.reply.trim();
+
+  const intent = intentSchema.safeParse(base.data.intent);
+  return intent.success ? { text, intent: intent.data } : { text };
 }

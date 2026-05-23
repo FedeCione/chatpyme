@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { track } from '@vercel/analytics';
 import { clinic } from '@/data/clinic';
-import { parseReply, type ParsedIntent } from '@/lib/intents';
+import { type ParsedIntent } from '@/lib/intents';
 import { Header } from './Header';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
@@ -121,16 +121,18 @@ export function Chatbot() {
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const { reply } = (await res.json()) as { reply: string };
-      const { text: cleanText, intent } = parseReply(reply);
+      const { reply, intent } = (await res.json()) as {
+        reply: string;
+        intent: ParsedIntent | null;
+      };
 
       const botMsg: BotOrUserMsg = {
         kind: 'chat',
         id: id(),
         role: 'assistant',
-        text: cleanText,
+        text: reply,
         timestamp: now(),
-        intent,
+        intent: intent ?? undefined,
       };
       setMessages((prev) => [...prev, botMsg]);
 
